@@ -1,0 +1,10 @@
+name: NationTech
+version: ${project.version}
+main: com.woe.nationtech.NationTech
+api-version: 1.19
+author: WOE
+depend:
+  - Towny
+  - UltimateAdvancementAPI
+  - CommandAPI
+description: A technology tree system for Towny nations.

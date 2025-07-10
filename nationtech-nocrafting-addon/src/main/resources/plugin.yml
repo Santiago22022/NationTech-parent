@@ -1,0 +1,8 @@
+name: NationTech-NoCrafting
+version: ${project.version}
+main: com.woe.nationtech.nocrafting.NationTechNoCrafting
+api-version: 1.19
+author: WOE
+depend:
+  - NationTech
+description: Restricts crafting based on NationTech technologies.

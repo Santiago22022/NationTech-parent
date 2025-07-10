@@ -1,0 +1,104 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.woe.nationtech</groupId>
+    <artifactId>nationtech-parent</artifactId>
+    <version>1.0.0</version>
+    <packaging>pom</packaging>
+
+    <name>NationTech-Parent</name>
+
+    <modules>
+        <module>nationtech-core</module>
+        <module>nationtech-nocrafting-addon</module>
+    </modules>
+
+    <properties>
+        <java.version>17</java.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <paper.api.version>1.20.1-R0.1-SNAPSHOT</paper.api.version>
+        <towny.version>0.101.1.0</towny.version>
+        <ultimateadvancementapi.version>2.5.2</ultimateadvancementapi.version>
+        <commandapi.version>9.5.1</commandapi.version>
+    </properties>
+
+    <repositories>
+        <repository>
+            <id>papermc-repo</id>
+            <url>https://repo.papermc.io/repository/maven-public/</url>
+        </repository>
+            <repository>
+                <id>jitpack.io</id>
+                <url>https://jitpack.io</url>
+            </repository>
+            <repository>
+        <id>central</id>
+        <name>Central Repository</name>
+        <url>https://repo1.maven.org/maven2</url>
+           </repository>
+        <repository>
+            <id>fren_gor-repo</id>
+            <url>https://nexus.frengor.com/repository/public/</url>
+        </repository>
+    </repositories>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>io.papermc.paper</groupId>
+                <artifactId>paper-api</artifactId>
+                <version>${paper.api.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.palmergames.bukkit.towny</groupId>
+                <artifactId>Towny</artifactId>
+                <version>${towny.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.frengor</groupId>
+                <artifactId>ultimateadvancementapi</artifactId>
+                <version>${ultimateadvancementapi.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>dev.jorel</groupId>
+                <artifactId>commandapi-bukkit-shade</artifactId>
+                <version>${commandapi.version}</version>
+                <scope>compile</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.8.1</version>
+                    <configuration>
+                        <source>${java.version}</source>
+                        <target>${java.version}</target>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-shade-plugin</artifactId>
+                    <version>3.2.4</version>
+                    <executions>
+                        <execution>
+                            <phase>package</phase>
+                            <goals>
+                                <goal>shade</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+</project>
