@@ -1,6 +1,6 @@
 package com.woe.nationtech.data;
 
-import com.palmergames.bukkit.towny.object.Nation;
+import com.palmergames.bukkit.towny.object.Nation; // Import específico
 import com.woe.nationtech.NationTech;
 import com.woe.nationtech.ui.AdvancementUIManager;
 import org.bukkit.ChatColor;
@@ -12,7 +12,6 @@ import org.bukkit.entity.Player;
 
 import java.io.File;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
@@ -48,7 +47,7 @@ public class TechnologyManager {
 
         for (String key : techSection.getKeys(false)) {
             ConfigurationSection section = techSection.getConfigurationSection(key);
-            if (section!= null) {
+            if (section != null) {
                 try {
                     Technology tech = new Technology(
                             key,

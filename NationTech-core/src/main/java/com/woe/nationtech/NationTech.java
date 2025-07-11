@@ -1,46 +1,76 @@
-package com.woe.nationtech.api;
+package com.woe.nationtech;
 
-import com.palmergames.bukkit.towny.object.Nation;
+import com.woe.nationtech.api.NationTechAPI;
+import com.woe.nationtech.cmds.CommandManager;
 import com.woe.nationtech.data.NationDataManager;
-import com.woe.nationtech.data.Technology;
 import com.woe.nationtech.data.TechnologyManager;
+import com.woe.nationtech.listener.PlayerListener;
 import com.woe.nationtech.ui.AdvancementUIManager;
+import dev.jorel.commandapi.CommandAPI;
+import dev.jorel.commandapi.CommandAPIBukkitConfig;
+import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.Set;
+public final class NationTech extends JavaPlugin {
 
-public class NationTechAPI {
+    private static NationTech instance;
+    private TechnologyManager technologyManager;
+    private NationDataManager nationDataManager;
+    private AdvancementUIManager advancementUIManager;
 
-    private static TechnologyManager technologyManager;
-    private static NationDataManager nationDataManager;
-    private static AdvancementUIManager advancementUIManager;
-
-    public static void setManagers(TechnologyManager techManager, NationDataManager dataManager, AdvancementUIManager uiManager) {
-        technologyManager = techManager;
-        nationDataManager = dataManager;
-        advancementUIManager = uiManager;
+    @Override
+    public void onLoad() {
+        CommandAPI.onLoad(new CommandAPIBukkitConfig(this));
     }
 
-    public static boolean hasTechnology(Nation nation, String techId) {
-        if (nation == null |
+    @Override
+    public void onEnable() {
+        instance = this;
+        CommandAPI.onEnable();
 
-                | techId == null) {
-            return false;
+        saveDefaultConfig();
+
+        this.technologyManager = new TechnologyManager(this);
+        this.nationDataManager = new NationDataManager(this);
+        // Creamos el UIManager después de los otros managers.
+        this.advancementUIManager = new AdvancementUIManager(this);
+
+        new CommandManager(this);
+        getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
+
+        NationTechAPI.setManagers(technologyManager, nationDataManager, advancementUIManager);
+
+        getLogger().info("NationTech has been enabled.");
+    }
+
+    @Override
+    public void onDisable() {
+        CommandAPI.onDisable();
+
+        if (nationDataManager!= null) {
+            nationDataManager.saveAllDirtyData();
         }
-        return nationDataManager.getNationData(nation.getUUID()).hasTechnology(techId);
+        getLogger().info("NationTech has been disabled.");
     }
 
-    public static Set<String> getUnlockedTechnologies(Nation nation) {
-        if (nation == null) {
-            return Set.of();
-        }
-        return nationDataManager.getNationData(nation.getUUID()).getUnlockedTechnologies();
+    // Método para recargar el UIManager, llamado desde el comando de admin.
+    public void reloadAdvancementManager() {
+        this.advancementUIManager = new AdvancementUIManager(this);
+        NationTechAPI.setManagers(technologyManager, nationDataManager, advancementUIManager);
     }
 
-    public static Technology getTechnology(String techId) {
-        return technologyManager.getTechnology(techId);
+    public static NationTech getInstance() {
+        return instance;
     }
 
-    public static Set<Technology> getAllTechnologies() {
-        return technologyManager.getTechnologies();
+    public TechnologyManager getTechnologyManager() {
+        return technologyManager;
+    }
+
+    public NationDataManager getNationDataManager() {
+        return nationDataManager;
+    }
+
+    public AdvancementUIManager getAdvancementUIManager() {
+        return advancementUIManager;
     }
 }

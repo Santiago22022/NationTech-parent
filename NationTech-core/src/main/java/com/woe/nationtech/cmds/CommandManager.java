@@ -8,7 +8,6 @@ import com.woe.nationtech.NationTech;
 import com.woe.nationtech.data.Technology;
 import com.woe.nationtech.data.TechnologyManager;
 import com.woe.nationtech.ui.AdvancementUIManager;
-import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.arguments.ArgumentSuggestions;
 import dev.jorel.commandapi.arguments.StringArgument;
@@ -29,6 +28,7 @@ public class CommandManager {
     }
 
     private void registerCommands() {
+        // Comando principal con subcomandos
         new CommandAPICommand("nationtech")
                 .withPermission("nationtech.command.view")
                 .withSubcommand(new CommandAPICommand("view")
@@ -41,7 +41,7 @@ public class CommandManager {
                         .withArguments(new StringArgument("tech_id").replaceSuggestions(ArgumentSuggestions.strings(info ->
                                 technologyManager.getTechnologies().stream()
                                         .map(Technology::id)
-                                        .toArray(String::new)
+                                        .toArray(String[]::new)
                         )))
                         .executesPlayer((player, args) -> {
                             unlockTechnology(player, (String) args.get("tech_id"));
@@ -57,6 +57,14 @@ public class CommandManager {
                                 })
                         )
                 )
+                .register();
+
+        new CommandAPICommand("techtree")
+                .withAliases("tecnologias", "tech") // Alias para el comando
+                .withPermission("nationtech.command.view") // Usamos el mismo permiso
+                .executesPlayer((player, args) -> {
+                    advancementUIManager.openTechTree(player);
+                })
                 .register();
     }
 

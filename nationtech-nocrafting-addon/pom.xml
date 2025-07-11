@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
@@ -10,30 +11,21 @@
   </parent>
 
   <artifactId>nationtech-nocrafting-addon</artifactId>
-  <packaging>jar</packaging>
-
-  <name>NationTech-NoCrafting-Addon</name>
 
   <dependencies>
-    <dependency>
-      <groupId>com.woe.nationtech</groupId>
-      <artifactId>nationtech-core</artifactId>
-      <version>1.0.0</version>
-      <scope>provided</scope>
-    </dependency>
+    <!-- Dependencia del servidor -->
     <dependency>
       <groupId>io.papermc.paper</groupId>
       <artifactId>paper-api</artifactId>
     </dependency>
+
+    <!-- Dependencia de tu módulo principal -->
+    <dependency>
+      <groupId>com.woe.nationtech</groupId>
+      <artifactId>nationtech-core</artifactId>
+      <version>${project.version}</version>
+      <scope>provided</scope>
+    </dependency>
   </dependencies>
 
-  <build>
-    <finalName>NationTech-NoCrafting</finalName>
-    <resources>
-      <resource>
-        <directory>src/main/resources</directory>
-        <filtering>true</filtering>
-      </resource>
-    </resources>
-  </build>
 </project>

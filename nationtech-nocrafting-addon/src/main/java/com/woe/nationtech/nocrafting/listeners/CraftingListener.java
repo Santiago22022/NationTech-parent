@@ -18,7 +18,9 @@ public class CraftingListener implements Listener {
 
     @EventHandler
     public void onPrepareCraft(PrepareItemCraftEvent event) {
-        if (event.getRecipe() == null) {
+        if (event.getRecipe() == null |
+
+                | event.getRecipe().getResult() == null) {
             return;
         }
 
