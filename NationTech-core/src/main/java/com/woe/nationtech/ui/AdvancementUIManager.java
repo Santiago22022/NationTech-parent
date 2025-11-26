@@ -21,22 +21,21 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class AdvancementUIManager {
 
-    private final NationTech plugin;
     private final TechnologyManager technologyManager;
     private final NationDataManager nationDataManager;
     private final AdvancementTab techTab;
-    private final Map<String, BaseAdvancement> advancements = new HashMap<>();
+    private final Map<String, Advancement> advancements = new HashMap<>();
 
-    public AdvancementUIManager(NationTech plugin) {
-        this.plugin = plugin;
-        this.technologyManager = plugin.getTechnologyManager();
-        this.nationDataManager = plugin.getNationDataManager();
+    public AdvancementUIManager(JavaPlugin plugin, TechnologyManager technologyManager, NationDataManager nationDataManager) {
+        this.technologyManager = technologyManager;
+        this.nationDataManager = nationDataManager;
         UltimateAdvancementAPI api = UltimateAdvancementAPI.getInstance(plugin);
 
         this.techTab = api.createAdvancementTab("nationtech");
@@ -45,32 +44,20 @@ public class AdvancementUIManager {
         AdvancementDisplay rootDisplay = new AdvancementDisplay(Material.KNOWLEDGE_BOOK, rootTitle, AdvancementFrameType.TASK, false, false, 0, 0, rootDescription);
 
         RootAdvancement root = new RootAdvancement(techTab, "root", rootDisplay, "textures/gui/advancements/backgrounds/stone.png");
+        advancements.put("root", root);
 
-        Map<String, Advancement> createdAdvancementsForParenting = new HashMap<>();
-        createdAdvancementsForParenting.put("root", root);
+        // Build the advancement tree recursively
+        buildAdvancementTree("root", root);
+    }
 
-        List<Technology> allTechs = new ArrayList<>(technologyManager.getTechnologies());
-        int lastSize;
-        do {
-            lastSize = allTechs.size();
-            Iterator<Technology> iterator = allTechs.iterator();
-            while (iterator.hasNext()) {
-                Technology tech = iterator.next();
-                String parentId = tech.dependencies().isEmpty() ? "root" : tech.dependencies().get(0);
-                if (createdAdvancementsForParenting.containsKey(parentId)) {
-                    Advancement parentAdv = createdAdvancementsForParenting.get(parentId);
-                    // Al crear el BaseAdvancement con su padre, se enlaza automáticamente al árbol.
-                    BaseAdvancement newAdv = createAdvancementForTech(tech, parentAdv);
-
-                    createdAdvancementsForParenting.put(tech.id(), newAdv);
-                    this.advancements.put(tech.id(), newAdv);
-                    iterator.remove();
-                }
-            }
-        } while (allTechs.size() < lastSize && !allTechs.isEmpty());
-
-        // Ya no es necesario registrar los logros hijos manualmente.
-        // La API los descubre a través de la jerarquía de padres.
+    private void buildAdvancementTree(String parentId, Advancement parent) {
+        technologyManager.getTechnologies().stream()
+                .filter(tech -> tech.dependencies().contains(parentId))
+                .forEach(tech -> {
+                    BaseAdvancement advancement = createAdvancementForTech(tech, parent);
+                    advancements.put(tech.id(), advancement);
+                    buildAdvancementTree(tech.id(), advancement);
+                });
     }
 
     private BaseAdvancement createAdvancementForTech(Technology tech, Advancement parent) {
@@ -101,21 +88,25 @@ public class AdvancementUIManager {
         }
 
         if (nation == null) {
-            for (BaseAdvancement advancement : advancements.values()) {
-                advancement.revoke(player);
+            for (Advancement advancement : advancements.values()) {
+                if (advancement instanceof BaseAdvancement) {
+                    ((BaseAdvancement) advancement).revoke(player);
+                }
             }
             return;
         }
 
         NationData nationData = nationDataManager.getNationData(nation.getUUID());
 
-        for (Map.Entry<String, BaseAdvancement> entry : advancements.entrySet()) {
+        for (Map.Entry<String, Advancement> entry : advancements.entrySet()) {
             String techId = entry.getKey();
-            BaseAdvancement advancement = entry.getValue();
-            if (nationData.hasTechnology(techId)) {
-                advancement.grant(player);
-            } else {
-                advancement.revoke(player);
+            Advancement advancement = entry.getValue();
+            if (advancement instanceof BaseAdvancement) {
+                if (nationData.hasTechnology(techId)) {
+                    ((BaseAdvancement) advancement).grant(player);
+                } else {
+                    ((BaseAdvancement) advancement).revoke(player);
+                }
             }
         }
     }

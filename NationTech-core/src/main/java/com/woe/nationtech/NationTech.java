@@ -12,10 +12,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public final class NationTech extends JavaPlugin {
 
-    private static NationTech instance;
-    private TechnologyManager technologyManager;
     private NationDataManager nationDataManager;
-    private AdvancementUIManager advancementUIManager;
 
     @Override
     public void onLoad() {
@@ -24,20 +21,21 @@ public final class NationTech extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        instance = this;
         CommandAPI.onEnable();
-
         saveDefaultConfig();
 
-        this.technologyManager = new TechnologyManager(this);
-        this.nationDataManager = new NationDataManager(this);
-        // Creamos el UIManager después de los otros managers.
-        this.advancementUIManager = new AdvancementUIManager(this);
+        // Initialize managers
+        nationDataManager = new NationDataManager(this);
+        TechnologyManager technologyManager = new TechnologyManager(this, nationDataManager);
+        AdvancementUIManager advancementUIManager = new AdvancementUIManager(this, technologyManager, nationDataManager);
+        technologyManager.setUiManager(advancementUIManager);
 
-        new CommandManager(this);
-        getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
+        // Initialize API
+        NationTechAPI api = new NationTechAPI(technologyManager, nationDataManager, advancementUIManager);
 
-        NationTechAPI.setManagers(technologyManager, nationDataManager, advancementUIManager);
+        // Register commands and listeners
+        new CommandManager(this, api);
+        getServer().getPluginManager().registerEvents(new PlayerListener(this, api), this);
 
         getLogger().info("NationTech has been enabled.");
     }
@@ -45,32 +43,9 @@ public final class NationTech extends JavaPlugin {
     @Override
     public void onDisable() {
         CommandAPI.onDisable();
-
-        if (nationDataManager!= null) {
-            nationDataManager.saveAllDirtyData();
+        if (nationDataManager != null) {
+            nationDataManager.close();
         }
         getLogger().info("NationTech has been disabled.");
-    }
-
-    // Método para recargar el UIManager, llamado desde el comando de admin.
-    public void reloadAdvancementManager() {
-        this.advancementUIManager = new AdvancementUIManager(this);
-        NationTechAPI.setManagers(technologyManager, nationDataManager, advancementUIManager);
-    }
-
-    public static NationTech getInstance() {
-        return instance;
-    }
-
-    public TechnologyManager getTechnologyManager() {
-        return technologyManager;
-    }
-
-    public NationDataManager getNationDataManager() {
-        return nationDataManager;
-    }
-
-    public AdvancementUIManager getAdvancementUIManager() {
-        return advancementUIManager;
     }
 }

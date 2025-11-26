@@ -1,0 +1,20 @@
+# ############################################################ #
+#                    NationTech Configuration                  #
+# ############################################################ #
+
+# Messages displayed to the player. Supports color codes (&) and PlaceholderAPI placeholders.
+messages:
+  no_permission: "&cYou do not have permission to use this command."
+  player_only_command: "&cThis command can only be run by a player."
+  not_in_nation: "&cYou must be in a nation to use this command."
+  tech_not_found: "&cTechnology '{tech_id}' not found."
+  tech_already_unlocked: "&cYour nation has already unlocked this technology."
+  tech_locked: "&cYour nation has not met the prerequisites for this technology."
+  not_enough_xp: "&cYou do not have enough experience levels to unlock this. Required: {cost}."
+  tech_unlocked: "&aYour nation has successfully unlocked {tech_name}!"
+  reload_success: "&aNationTech configuration reloaded successfully."
+
+# Configuration for the technology unlock costs.
+# 'cost_type' can be 'XP_LEVELS' or 'VAULT' (if Vault is installed).
+economy:
+  cost_type: "XP_LEVELS"

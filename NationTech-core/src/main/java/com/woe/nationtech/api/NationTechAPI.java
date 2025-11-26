@@ -10,35 +10,67 @@ import java.util.Set;
 
 public class NationTechAPI {
 
-    private static TechnologyManager technologyManager;
-    private static NationDataManager nationDataManager;
-    private static AdvancementUIManager advancementUIManager;
+    private final TechnologyManager technologyManager;
+    private final NationDataManager nationDataManager;
+    private final AdvancementUIManager advancementUIManager;
+    private static NationTechAPI instance;
 
-    public static void setManagers(TechnologyManager techManager, NationDataManager dataManager, AdvancementUIManager uiManager) {
-        technologyManager = techManager;
-        nationDataManager = dataManager;
-        advancementUIManager = uiManager;
+    public NationTechAPI(TechnologyManager technologyManager, NationDataManager nationDataManager, AdvancementUIManager advancementUIManager) {
+        this.technologyManager = technologyManager;
+        this.nationDataManager = nationDataManager;
+        this.advancementUIManager = advancementUIManager;
+        instance = this;
     }
 
-    public static boolean hasTechnology(Nation nation, String techId) {
+    public static NationTechAPI get() {
+        return instance;
+    }
+
+    public boolean hasTechnology(Nation nation, String techId) {
         if (nation == null || techId == null) {
             return false;
         }
         return nationDataManager.getNationData(nation.getUUID()).hasTechnology(techId);
     }
 
-    public static Set<String> getUnlockedTechnologies(Nation nation) {
+    public Set<String> getUnlockedTechnologies(Nation nation) {
         if (nation == null) {
             return Set.of();
         }
         return nationDataManager.getNationData(nation.getUUID()).getUnlockedTechnologies();
     }
 
-    public static Technology getTechnology(String techId) {
+    public Technology getTechnology(String techId) {
         return technologyManager.getTechnology(techId);
     }
 
-    public static Set<Technology> getAllTechnologies() {
+    public Set<Technology> getAllTechnologies() {
         return technologyManager.getTechnologies();
+    }
+
+    public void unlockTechnology(org.bukkit.entity.Player player, String techId) {
+        com.palmergames.bukkit.towny.object.Resident resident = com.palmergames.bukkit.towny.TownyAPI.getInstance().getResident(player);
+        if (resident == null || !resident.hasTown()) {
+            player.sendMessage(org.bukkit.ChatColor.RED + "You must be in a town to do that.");
+            return;
+        }
+        try {
+            Nation nation = resident.getTown().getNation();
+            technologyManager.unlockTechnology(player, nation, techId);
+        } catch (com.palmergames.bukkit.towny.exceptions.NotRegisteredException e) {
+            player.sendMessage(org.bukkit.ChatColor.RED + "Your town is not part of a nation.");
+        }
+    }
+
+    public TechnologyManager getTechnologyManager() {
+        return technologyManager;
+    }
+
+    public NationDataManager getNationDataManager() {
+        return nationDataManager;
+    }
+
+    public AdvancementUIManager getAdvancementUIManager() {
+        return advancementUIManager;
     }
 }

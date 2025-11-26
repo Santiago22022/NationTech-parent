@@ -20,25 +20,26 @@ public class TechnologyManager {
 
     private final NationTech plugin;
     private final NationDataManager dataManager;
-    private final AdvancementUIManager uiManager;
+    private AdvancementUIManager uiManager;
     private final Set<Technology> technologies = new HashSet<>();
-    private File technologiesFile;
-    private FileConfiguration technologiesConfig;
 
-    public TechnologyManager(NationTech plugin) {
+    public TechnologyManager(NationTech plugin, NationDataManager dataManager) {
         this.plugin = plugin;
-        this.dataManager = plugin.getNationDataManager();
-        this.uiManager = plugin.getAdvancementUIManager();
+        this.dataManager = dataManager;
         loadTechnologies();
+    }
+
+    public void setUiManager(AdvancementUIManager uiManager) {
+        this.uiManager = uiManager;
     }
 
     public void loadTechnologies() {
         technologies.clear();
-        technologiesFile = new File(plugin.getDataFolder(), "technologies.yml");
+        File technologiesFile = new File(plugin.getDataFolder(), "technologies.yml");
         if (!technologiesFile.exists()) {
             plugin.saveResource("technologies.yml", false);
         }
-        technologiesConfig = YamlConfiguration.loadConfiguration(technologiesFile);
+        FileConfiguration technologiesConfig = YamlConfiguration.loadConfiguration(technologiesFile);
         ConfigurationSection techSection = technologiesConfig.getConfigurationSection("technologies");
         if (techSection == null) {
             plugin.getLogger().severe("'technologies' section not found in technologies.yml!");
