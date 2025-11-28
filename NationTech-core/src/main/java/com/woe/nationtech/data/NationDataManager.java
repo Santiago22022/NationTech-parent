@@ -6,6 +6,7 @@ import com.google.common.cache.LoadingCache;
 import com.woe.nationtech.NationTech;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.io.IOException;
@@ -21,9 +22,9 @@ public class NationDataManager {
     private final File dataFolder;
     private final LoadingCache<UUID, NationData> nationDataCache;
 
-    public NationDataManager(NationTech plugin) {
-        this.plugin = plugin;
-        this.dataFolder = new File(plugin.getDataFolder(), "data");
+    public NationDataManager(JavaPlugin plugin) {
+        this.plugin = (NationTech) plugin;
+        this.dataFolder = new File(this.plugin.getDataFolder(), "data");
         if (!dataFolder.exists()) {
             dataFolder.mkdirs();
         }
@@ -31,14 +32,13 @@ public class NationDataManager {
         this.nationDataCache = CacheBuilder.newBuilder()
                 .maximumSize(1000)
                 .expireAfterAccess(30, TimeUnit.MINUTES)
+                .removalListener(notification -> saveNationData((NationData) notification.getValue()))
                 .build(new CacheLoader<>() {
                     @Override
                     public NationData load(UUID key) {
                         return loadNationDataFromFile(key);
                     }
                 });
-
-        plugin.getServer().getScheduler().runTaskTimerAsynchronously(plugin, this::saveAllDirtyData, 20L * 60 * 5, 20L * 60 * 5);
     }
 
     public NationData getNationData(UUID nationUUID) {
@@ -74,9 +74,14 @@ public class NationDataManager {
         }
     }
 
-    public void saveAllDirtyData() {
-        nationDataCache.asMap().values().stream()
-                .filter(NationData::isDirty)
-                .forEach(this::saveNationData);
+    public void saveNationData(UUID nationUUID) {
+        NationData data = nationDataCache.getIfPresent(nationUUID);
+        if (data != null && data.isDirty()) {
+            saveNationData(data);
+        }
+    }
+
+    public void close() {
+        nationDataCache.invalidateAll();
     }
 }

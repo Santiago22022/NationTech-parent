@@ -1,0 +1,83 @@
+# ############################################################ #
+#                    Technology Definitions                    #
+# ############################################################ #
+#
+# Define all available technologies for nations here.
+#
+# id: A unique, internal identifier for the technology. No spaces or special characters.
+# display-name: The name shown in the UI. Supports color codes.
+# icon: The Bukkit Material name for the item icon in the UI.
+# description: A list of strings for the item's lore in the UI.
+# dependencies: A list of technology 'id's that must be unlocked first. Omit for root technologies.
+# cost: The cost to unlock the technology (e.g., experience levels).
+# x-coord: The horizontal position in the advancement tab.
+# y-coord: The vertical position in the advancement tab.
+# recipe-keys: A list of Minecraft recipe keys (e.g., 'minecraft:stone_pickaxe') unlocked by this tech.
+
+technologies:
+  basic_agriculture:
+    id: "basic_agriculture"
+    display-name: "&aAgricultura Básica"
+    icon: "WHEAT"
+    description:
+      - "&7Desbloquea la capacidad de cultivar"
+      - "&7y cosechar los cultivos básicos."
+    dependencies:
+    cost: 5
+    x-coord: 0
+    y-coord: 0
+    recipe-keys:
+      - "minecraft:wheat"
+      - "minecraft:bread"
+      - "minecraft:wooden_hoe"
+      - "minecraft:stone_hoe"
+
+  animal_husbandry:
+    id: "animal_husbandry"
+    display-name: "&eGanadería"
+    icon: "LEAD"
+    description:
+      - "&7Permite criar animales para obtener"
+      - "&7recursos de forma sostenible."
+    dependencies:
+      - "basic_agriculture"
+    cost: 10
+    x-coord: 1
+    y-coord: 0
+    recipe-keys:
+      - "minecraft:lead"
+      - "minecraft:shears"
+
+  stone_working:
+    id: "stone_working"
+    display-name: "&8Mampostería"
+    icon: "STONE_PICKAXE"
+    description:
+      - "&7El arte de trabajar la piedra,"
+      - "&7desbloqueando herramientas y hornos."
+    dependencies:
+    cost: 5
+    x-coord: 0
+    y-coord: 1
+    recipe-keys:
+      - "minecraft:stone_pickaxe"
+      - "minecraft:stone_axe"
+      - "minecraft:stone_sword"
+      - "minecraft:stone_shovel"
+      - "minecraft:furnace"
+
+  basic_smelting:
+    id: "basic_smelting"
+    display-name: "&7Fundición Básica"
+    icon: "FURNACE"
+    description:
+      - "&7Aprende a fundir menas para"
+      - "&7obtener metales más fuertes."
+    dependencies:
+      - "stone_working"
+    cost: 15
+    x-coord: 1
+    y-coord: 1
+    recipe-keys:
+      - "minecraft:iron_ingot_from_smelting_iron_ore"
+      - "minecraft:gold_ingot_from_smelting_gold_ore"

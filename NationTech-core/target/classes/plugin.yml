@@ -1,0 +1,12 @@
+name: NationTech
+version: '${project.version}'
+main: com.woe.nationtech.NationTech
+api-version: '1.20'
+author: WOE
+# Añadimos load: STARTUP para que el método onLoad() sea llamado
+load: STARTUP
+depend:
+  - Towny
+  - UltimateAdvancementAPI
+  - CommandAPI
+description: A technology tree system for Towny nations.
